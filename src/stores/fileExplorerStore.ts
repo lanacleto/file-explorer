@@ -11,6 +11,9 @@ function createFileExplorerStore() {
 
   return {
     subscribe,
+    get expandedNodes() {
+      return get({ subscribe }).expandedNodes;
+    },
     toggleExpanded: (nodeId: string) => {
       update(state => {
         const newExpandedNodes = new Set(state.expandedNodes);
@@ -30,4 +33,4 @@ function createFileExplorerStore() {
   };
 }
 
-export const fileExplorerStore = createFileExplorerStore(); 
+export const fileExplorerStore = createFileExplorerStore();

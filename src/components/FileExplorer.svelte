@@ -1,166 +1,117 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import api from '../api';
-  import { 
-    ArrowDown, 
-    ArrowRight, 
-    XFile,
-  } from '../assets/icons';
+  import type { TreeNode } from '../types/fileExplorer';
+  import { fileExplorerStore } from '../stores/fileExplorerStore';
   import { FileIconService } from '../services/iconMapping';
   import { FileExplorerKeyboardService } from '../services/keyboardHandler';
-  import { fileExplorerStore } from '../stores/fileExplorerStore';
-  import type { TreeNode } from '../types/fileExplorer';
+  import ArrowDown from '../assets/icons/ArrowDown.svelte';
+  import ArrowRight from '../assets/icons/ArrowRight.svelte';
+  import XFile from '../assets/icons/XFile.svelte';
   import FileExplorer from './FileExplorer.svelte';
 
-  interface Props {
-    node?: TreeNode | null;
-    onDelete?: (id: string) => void;
+  let { node, onDelete, isRoot = true } = $props<{
+    node: TreeNode | null;
+    onDelete: (id: string) => void;
     isRoot?: boolean;
-  }
+  }>();
 
-  let { node = $bindable(null), onDelete = () => {}, isRoot = true }: Props = $props();
-
-  let keyboardService: FileExplorerKeyboardService;
   let expandedNodes = $state(new Set<string>());
 
-  // Subscribe to store changes
   $effect(() => {
     const unsubscribe = fileExplorerStore.subscribe(state => {
       expandedNodes = state.expandedNodes;
     });
-    
     return unsubscribe;
   });
 
-  // Helper function to check if a node is expanded
+  const keyboardService = new FileExplorerKeyboardService(
+    (id) => fileExplorerStore.toggleExpanded(id),
+    (id) => onDelete(id)
+  );
+
+  function getFileIcon(filename: string) {
+    return FileIconService.getFileIcon(filename);
+  }
+
   function isExpanded(nodeId: string): boolean {
     return expandedNodes.has(nodeId);
-  }
-
-  const getFileIcon = $derived((filename: string) => FileIconService.getFileIcon(filename));
-
-  onMount(() => {
-    if (!node) {
-      api.getDirectoryTree().then(result => {
-        node = result;
-      });
-    }
-    
-    keyboardService = new FileExplorerKeyboardService(
-      (nodeId: string) => fileExplorerStore.toggleExpanded(nodeId),
-      (nodeId: string) => handleDelete(nodeId)
-    );
-  });
-
-  async function handleDelete(id: string) {
-    if (onDelete) {
-      onDelete(id);
-    }
-  }
-
-  function handleKeyDown(event: KeyboardEvent, nodeId: string) {
-    keyboardService?.handleKeyDown(event, nodeId);
-  }
-
-  function handleDeleteKeyDown(event: KeyboardEvent, nodeId: string) {
-    keyboardService?.handleDeleteKeyDown(event, nodeId);
   }
 </script>
 
 {#if isRoot}
   <div class="file-explorer" role="tree" aria-label="File Explorer">
     {#if node}
-      {@const currentNode = node}
-      <h2 class="project-header">{currentNode.name}</h2>
-      
-      {#if currentNode.children}
-        <div class="project-children">
-          {#each currentNode.children as child}
-            <FileExplorer 
-              node={child} 
-              {onDelete}
-              isRoot={false}
-            />
-          {/each}
-        </div>
-      {/if}
+      <h2 class="project-header">{node.name}</h2>
+      <div class="project-children">
+        {#each node.children || [] as childNode (childNode.id)}
+          <FileExplorer node={childNode} {onDelete} isRoot={false} />
+        {/each}
+      </div>
     {:else}
       <div>Loading...</div>
     {/if}
   </div>
-{:else}
-  {#if node}
-    {@const currentNode = node}
-    {@const expanded = isExpanded(currentNode.id)}
-    <div class="node" role="treeitem" aria-expanded={currentNode.type === 'folder' ? expanded : undefined} aria-selected="false">
-      <div class="node-content">
-        <div class="grid-item">
-          {#if currentNode.type === 'folder'}
-            <button 
-              class="folder-button" 
-              onclick={() => fileExplorerStore.toggleExpanded(currentNode.id)}
-              onkeydown={(e) => handleKeyDown(e, currentNode.id)}
-              aria-label="{expanded ? 'Collapse' : 'Expand'} {currentNode.name}"
-              tabindex="0"
-            >
-              {#if expanded}
-                <ArrowDown width={24} height={24} />
-              {:else}
-                <ArrowRight width={24} height={24} />
-              {/if}
-            </button>
-          {:else}
-            {@const SvelteComponent = getFileIcon(currentNode.name)}
-            <span class="icon" tabindex="0" role="button" aria-label="File: {currentNode.name}">
-              <SvelteComponent width={24} height={24} />
-            </span>
-          {/if}
-        </div>
-        
-        <div class="grid-item">
-          {#if currentNode.type === 'folder'}
-            <span class="name clickable" role="presentation" onclick={() => fileExplorerStore.toggleExpanded(currentNode.id)} onkeydown={(e) => handleKeyDown(e, currentNode.id)}>
-              {currentNode.name}
-            </span>
-          {:else}
-            <span class="name">
-              {currentNode.name}
-            </span>
-          {/if}
-        </div>
-        
-        <div class="grid-item">
-          <button 
-            class="delete-button" 
-            onclick={() => handleDelete(currentNode.id)}
-            onkeydown={(e) => handleDeleteKeyDown(e, currentNode.id)}
-            title="Delete {currentNode.name}"
-            aria-label="Delete {currentNode.name}"
-            tabindex="0"
+{:else if node}
+  {@const expanded = isExpanded(node.id)}
+  <div
+    class="node"
+    role="treeitem"
+    aria-expanded={node.type === 'folder' ? expanded : undefined}
+    aria-selected="false"
+  >
+    <div class="node-content">
+      <div class="grid-item">
+        {#if node.type === 'folder'}
+          <button
+            class="folder-button"
+            onclick={() => fileExplorerStore.toggleExpanded(node.id)}
+            onkeydown={(e) => keyboardService.handleKeyDown(e, node.id)}
+            aria-label={expanded ? `Collapse ${node.name}` : `Expand ${node.name}`}
           >
-            <XFile width={24} height={24} />
+            {#if expanded}
+              <ArrowDown width={24} height={24} />
+            {:else}
+              <ArrowRight width={24} height={24} />
+            {/if}
           </button>
-        </div>
+        {:else}
+          {@const IconComponent = getFileIcon(node.name)}
+          <span class="icon" role="button" aria-label={`File: ${node.name}`} tabindex="0">
+            <IconComponent width={24} height={24} />
+          </span>
+        {/if}
       </div>
-      
-      {#if currentNode.type === 'folder' && currentNode.children && expanded}
-        <div class="children" role="group">
-          {#each currentNode.children as child}
-            <FileExplorer 
-              node={child} 
-              {onDelete}
-              isRoot={false}
-            />
-          {/each}
-        </div>
-      {/if}
+      <div class="grid-item">
+         {#if node.type === 'folder'}
+            <span class="name clickable" role="presentation" onclick={() => fileExplorerStore.toggleExpanded(node.id)} onkeydown={(e) => keyboardService.handleKeyDown(e, node.id)}>{node.name}</span>
+        {:else}
+            <span class="name">{node.name}</span>
+        {/if}
+      </div>
+      <div class="grid-item">
+        <button
+          class="delete-button"
+          onclick={() => onDelete(node.id)}
+          onkeydown={(e) => keyboardService.handleDeleteKeyDown(e, node.id)}
+          title={`Delete ${node.name}`}
+          aria-label={`Delete ${node.name}`}
+        >
+          <XFile width={24} height={24} />
+        </button>
+      </div>
     </div>
-  {/if}
+    {#if node.type === 'folder' && node.children && expanded}
+      <div class="children" role="group">
+        {#each node.children as childNode (childNode.id)}
+          <FileExplorer {onDelete} node={childNode} isRoot={false} />
+        {/each}
+      </div>
+    {/if}
+  </div>
 {/if}
 
 <style lang="scss">
   @use '../styles/variables.scss' as *;
-  
+
   .file-explorer {
     width: fit-content;
     min-width: 300px;
@@ -171,6 +122,8 @@
     max-height: 100vh;
     max-width: 100vw;
     background-color: $background-main;
+    scrollbar-width: thin;
+    scrollbar-color: $border-main transparent;
 
     &::-webkit-scrollbar {
       width: 4px;
@@ -184,18 +137,15 @@
     &::-webkit-scrollbar-thumb {
       background: $border-main;
       border-radius: $border-radius-full;
-      
-      &:hover {
-        background: $gray-500;
-      }
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: $gray-500;
     }
 
     &::-webkit-scrollbar-corner {
       background: transparent;
     }
-
-    scrollbar-width: thin;
-    scrollbar-color: $border-main transparent;
   }
 
   .project-header {
@@ -232,12 +182,12 @@
       .name {
         color: $white;
       }
-      
-      .icon :global(svg) {
+
+      .icon svg {
         fill: $white;
       }
-      
-      .folder-button :global(svg) {
+
+      .folder-button svg {
         fill: $white;
       }
 
@@ -245,23 +195,27 @@
         opacity: 1;
       }
     }
+  }
 
-    .grid-item {
-      @include flex-center;
+  .grid-item {
+    @include flex-center;
 
-      &:nth-child(2) {
-        justify-content: flex-start;
-      }
+    &:nth-child(2) {
+      justify-content: flex-start;
+    }
 
-      &:nth-child(3) {
-        justify-content: flex-end;
-      }
+    &:nth-child(3) {
+      justify-content: flex-end;
     }
   }
 
   .icon {
     width: 20px;
     @include flex-center;
+
+    &:focus-visible {
+      @include focus-ring($primary-color);
+    }
   }
 
   .folder-button {
@@ -270,7 +224,7 @@
     @include button-reset;
     @include flex-center;
     @include transition(transform);
-    
+
     &:hover {
       transform: scale(1.1);
     }
@@ -289,7 +243,7 @@
 
     &.clickable {
       cursor: pointer;
-      
+
       &:hover {
         color: $white;
       }
@@ -300,15 +254,13 @@
     @include button-reset;
     @include flex-center;
     color: $gray-500;
-    padding: $spacing-1 $spacing-1;
+    padding: $spacing-1;
     border-radius: $border-radius-sm;
     opacity: 0;
     @include transition(all);
-    
-    &:hover {
-      :global(svg path) {
-        fill: $white;
-      }
+
+    &:hover svg path {
+      fill: $white;
     }
 
     &:focus {
@@ -322,10 +274,7 @@
 
   .children {
     margin-left: $spacing-3;
+    border-left: 1px solid rgba($border-main, 0.3);
     padding-left: $spacing-2;
-  }
-
-  .icon:focus-visible {
-    @include focus-ring($primary-color);
   }
 </style>

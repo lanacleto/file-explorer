@@ -1,62 +1,27 @@
 <script lang="ts">
-  import api, { type TreeNode } from './api';
   import FileExplorer from './components/FileExplorer.svelte';
+  import api from './api';
+  import type { TreeNode } from './types/fileExplorer';
 
-  let directoryTree = $state<TreeNode | null>(null);
-  let isLoading = $state(true);
+  let directoryTree: TreeNode | null = $state(null);
 
   $effect(() => {
-    loadDirectoryTree();
+    api.getDirectoryTree().then(data => {
+      directoryTree = data;
+    });
   });
 
-  async function loadDirectoryTree() {
-    try {
-      isLoading = true;
-      directoryTree = await api.getDirectoryTree();
-    } catch (error) {
-      console.error('Failed to load directory tree:', error);
-    } finally {
-      isLoading = false;
-    }
-  }
-
   async function handleDelete(id: string) {
-    if (!directoryTree) return;
-    try {
-      directoryTree = await api.deleteById(id);
-    } catch (error) {
-      console.error('Failed to delete item:', error);
-    }
+    directoryTree = await api.deleteById(id);
   }
 </script>
 
 <main>
-  {#if isLoading}
-    <div class="loading">Loading file explorer...</div>
-  {:else}
-    <FileExplorer 
-      node={directoryTree} 
-      onDelete={handleDelete}
-    />
-  {/if}
+  <FileExplorer node={directoryTree} onDelete={handleDelete} />
 </main>
 
-<style lang="scss">
-  @use './styles/variables.scss' as *;
-
+<style>
   main {
-    font-family: $font-family-sans;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    font-size: $font-size-sm;
-    color: $text-file-explorer;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   }
 </style>
- 
