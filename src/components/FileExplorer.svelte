@@ -10,13 +10,34 @@
   import { FileExplorerKeyboardService } from '../services/keyboardHandler';
   import { fileExplorerStore } from '../stores/fileExplorerStore';
   import type { TreeNode } from '../types/fileExplorer';
+  import FileExplorer from './FileExplorer.svelte';
 
-  export let node: TreeNode | null = null;
-  export let onDelete: (id: string) => void = () => {};
-  export let isRoot = true;
+  interface Props {
+    node?: TreeNode | null;
+    onDelete?: (id: string) => void;
+    isRoot?: boolean;
+  }
 
-  let expandedNodes: Set<string> = new Set();
+  let { node = $bindable(null), onDelete = () => {}, isRoot = true }: Props = $props();
+
   let keyboardService: FileExplorerKeyboardService;
+  let expandedNodes = $state(new Set<string>());
+
+  // Subscribe to store changes
+  $effect(() => {
+    const unsubscribe = fileExplorerStore.subscribe(state => {
+      expandedNodes = state.expandedNodes;
+    });
+    
+    return unsubscribe;
+  });
+
+  // Helper function to check if a node is expanded
+  function isExpanded(nodeId: string): boolean {
+    return expandedNodes.has(nodeId);
+  }
+
+  const getFileIcon = $derived((filename: string) => FileIconService.getFileIcon(filename));
 
   onMount(() => {
     if (!node) {
@@ -29,22 +50,12 @@
       (nodeId: string) => fileExplorerStore.toggleExpanded(nodeId),
       (nodeId: string) => handleDelete(nodeId)
     );
-
-    const unsubscribe = fileExplorerStore.subscribe(state => {
-      expandedNodes = state.expandedNodes;
-    });
-
-    return unsubscribe;
   });
 
   async function handleDelete(id: string) {
     if (onDelete) {
       onDelete(id);
     }
-  }
-
-  function getFileIcon(filename: string) {
-    return FileIconService.getFileIcon(filename);
   }
 
   function handleKeyDown(event: KeyboardEvent, nodeId: string) {
@@ -65,9 +76,8 @@
       {#if currentNode.children}
         <div class="project-children">
           {#each currentNode.children as child}
-            <svelte:self 
+            <FileExplorer 
               node={child} 
-              {expandedNodes} 
               {onDelete}
               isRoot={false}
             />
@@ -81,33 +91,35 @@
 {:else}
   {#if node}
     {@const currentNode = node}
-    <div class="node" role="treeitem" aria-expanded={currentNode.type === 'folder' ? expandedNodes.has(currentNode.id) : undefined} aria-selected="false">
+    {@const expanded = isExpanded(currentNode.id)}
+    <div class="node" role="treeitem" aria-expanded={currentNode.type === 'folder' ? expanded : undefined} aria-selected="false">
       <div class="node-content">
         <div class="grid-item">
           {#if currentNode.type === 'folder'}
             <button 
               class="folder-button" 
-              on:click={() => fileExplorerStore.toggleExpanded(currentNode.id)}
-              on:keydown={(e) => handleKeyDown(e, currentNode.id)}
-              aria-label="{expandedNodes.has(currentNode.id) ? 'Collapse' : 'Expand'} {currentNode.name}"
+              onclick={() => fileExplorerStore.toggleExpanded(currentNode.id)}
+              onkeydown={(e) => handleKeyDown(e, currentNode.id)}
+              aria-label="{expanded ? 'Collapse' : 'Expand'} {currentNode.name}"
               tabindex="0"
             >
-              {#if expandedNodes.has(currentNode.id)}
+              {#if expanded}
                 <ArrowDown width={24} height={24} />
               {:else}
                 <ArrowRight width={24} height={24} />
               {/if}
             </button>
           {:else}
+            {@const SvelteComponent = getFileIcon(currentNode.name)}
             <span class="icon" tabindex="0" role="button" aria-label="File: {currentNode.name}">
-              <svelte:component this={getFileIcon(currentNode.name)} width={24} height={24} />
+              <SvelteComponent width={24} height={24} />
             </span>
           {/if}
         </div>
         
         <div class="grid-item">
           {#if currentNode.type === 'folder'}
-            <span class="name clickable" role="presentation" on:click={() => fileExplorerStore.toggleExpanded(currentNode.id)} on:keydown={(e) => handleKeyDown(e, currentNode.id)}>
+            <span class="name clickable" role="presentation" onclick={() => fileExplorerStore.toggleExpanded(currentNode.id)} onkeydown={(e) => handleKeyDown(e, currentNode.id)}>
               {currentNode.name}
             </span>
           {:else}
@@ -120,8 +132,8 @@
         <div class="grid-item">
           <button 
             class="delete-button" 
-            on:click={() => handleDelete(currentNode.id)}
-            on:keydown={(e) => handleDeleteKeyDown(e, currentNode.id)}
+            onclick={() => handleDelete(currentNode.id)}
+            onkeydown={(e) => handleDeleteKeyDown(e, currentNode.id)}
             title="Delete {currentNode.name}"
             aria-label="Delete {currentNode.name}"
             tabindex="0"
@@ -131,12 +143,11 @@
         </div>
       </div>
       
-      {#if currentNode.type === 'folder' && currentNode.children && expandedNodes.has(currentNode.id)}
+      {#if currentNode.type === 'folder' && currentNode.children && expanded}
         <div class="children" role="group">
           {#each currentNode.children as child}
-            <svelte:self 
+            <FileExplorer 
               node={child} 
-              {expandedNodes} 
               {onDelete}
               isRoot={false}
             />
@@ -311,7 +322,6 @@
 
   .children {
     margin-left: $spacing-3;
-    border-left: 1px solid rgba($border-main, 0.3);
     padding-left: $spacing-2;
   }
 

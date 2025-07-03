@@ -1,25 +1,44 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import api, { type TreeNode } from './api';
   import FileExplorer from './components/FileExplorer.svelte';
 
-  let directoryTree: TreeNode | null = null;
+  let directoryTree = $state<TreeNode | null>(null);
+  let isLoading = $state(true);
 
-  onMount(async () => {
-    directoryTree = await api.getDirectoryTree();
+  $effect(() => {
+    loadDirectoryTree();
   });
+
+  async function loadDirectoryTree() {
+    try {
+      isLoading = true;
+      directoryTree = await api.getDirectoryTree();
+    } catch (error) {
+      console.error('Failed to load directory tree:', error);
+    } finally {
+      isLoading = false;
+    }
+  }
 
   async function handleDelete(id: string) {
     if (!directoryTree) return;
-    directoryTree = await api.deleteById(id);
+    try {
+      directoryTree = await api.deleteById(id);
+    } catch (error) {
+      console.error('Failed to delete item:', error);
+    }
   }
 </script>
 
 <main>
-  <FileExplorer 
-    node={directoryTree} 
-    onDelete={handleDelete}
-  />
+  {#if isLoading}
+    <div class="loading">Loading file explorer...</div>
+  {:else}
+    <FileExplorer 
+      node={directoryTree} 
+      onDelete={handleDelete}
+    />
+  {/if}
 </main>
 
 <style lang="scss">
@@ -27,6 +46,17 @@
 
   main {
     font-family: $font-family-sans;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: $font-size-sm;
+    color: $text-file-explorer;
   }
 </style>
  
