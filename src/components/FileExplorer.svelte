@@ -218,8 +218,6 @@
     @include transition(background-color);
 
     &:hover {
-      background-color: rgba($white, 0.05);
-      
       .name {
         color: $white;
       }
@@ -248,69 +246,66 @@
         justify-content: flex-end;
       }
     }
+  }
 
-    .icon {
-      width: 20px;
-      @include flex-center;
+  .icon {
+    width: 20px;
+    @include flex-center;
+  }
+
+  .folder-button {
+    width: 24px;
+    height: 24px;
+    @include button-reset;
+    @include flex-center;
+    @include transition(transform);
+    
+    &:hover {
+      transform: scale(1.1);
     }
 
-    .folder-button {
-      width: 24px;
-      height: 24px;
-      @include button-reset;
-      @include flex-center;
-      @include transition(transform);
+    &:focus-visible {
+      @include focus-ring($primary-color);
+    }
+  }
+
+  .name {
+    font-size: $font-size-xs;
+    text-align: left;
+    flex: 1;
+    color: $text-file-explorer;
+    @include transition(color);
+
+    &.clickable {
+      cursor: pointer;
       
       &:hover {
-        transform: scale(1.1);
+        color: $white;
       }
+    }
+  }
 
-      &:focus-visible {
-        @include focus-ring($primary-color);
+  .delete-button {
+    @include button-reset;
+    @include flex-center;
+    color: $gray-500;
+    padding: $spacing-1 $spacing-1;
+    border-radius: $border-radius-sm;
+    opacity: 0;
+    @include transition(all);
+    
+    &:hover {
+      :global(svg path) {
+        fill: $white;
       }
     }
 
-    .name {
-      font-size: $font-size-xs;
-      text-align: left;
-      flex: 1;
-      color: $text-file-explorer;
-      @include transition(color);
-
-      &.clickable {
-        cursor: pointer;
-        
-        &:hover {
-          color: $white;
-        }
-      }
+    &:focus {
+      opacity: 1;
     }
 
-    .delete-button {
-      @include button-reset;
-      @include flex-center;
-      color: $gray-500;
-      padding: $spacing-1 $spacing-1;
-      border-radius: $border-radius-sm;
-      opacity: 0;
-      @include transition(all);
-      
-      &:hover {
-        color: $error-color;
-        background-color: rgba($error-color, 0.1);
-        
-        :global(svg path) {
-          fill: $white;
-        }
-      }
-
-      &:focus {
-        opacity: 1;
-      }
-
-      &:focus-visible {
-        @include focus-ring($primary-color);
-      }
+    &:focus-visible {
+      @include focus-ring($primary-color);
     }
   }
 
