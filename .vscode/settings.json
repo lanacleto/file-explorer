@@ -1,0 +1,22 @@
+{
+  "svelte.enable-ts-plugin": true,
+  "svelte.plugin.svelte.defaultScriptLanguage": "ts",
+  "svelte.plugin.svelte.defaultStyleLanguage": "scss",
+  "svelte.plugin.svelte.defaultTemplateLanguage": "svelte",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "emmet.includeLanguages": {
+    "svelte": "html"
+  },
+  "files.associations": {
+    "*.svelte": "svelte",
+    "*.scss": "scss"
+  },
+  "scss.validate": true,
+  "scss.lint.unknownVendorSpecificProperties": "ignore",
+  "css.validate": false,
+  "less.validate": false
+} 

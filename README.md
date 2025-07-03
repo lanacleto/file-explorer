@@ -1,32 +1,79 @@
-# Carta File Explorer Take-home
+# File Explorer - Svelte
 
-Welcome to the Carta front-end take-home challenge, we're excited to have you! 🎉🎉🎉
+A modern file explorer built with Svelte and TypeScript.
 
-Please refer to the document shared by your Carta recruiter for details about the problem and help getting started!
+## Features
 
-## Quick start
+- 📁 **File Tree Navigation**: Expand and collapse folders
+- 🗑️ **Delete Functionality**: Remove files and folders with confirmation
+- 🎨 **Dynamic Icons**: Different icons and colors for various file types
+- ♿ **Accessibility**: Keyboard navigation and ARIA support
+- ⚡ **Fast Performance**: Built with Svelte for optimal performance
 
-```sh
-# Install NPM dependencies
-yarn
-# Run the app
-yarn start
-# Zip up your solution when you're done
-tar -czvf [your initials]-CARTA.tar.gz --exclude="node_modules" .
+## Tech Stack
+
+- **Svelte 4** - Reactive UI framework
+- **TypeScript** - Type safety
+- **Vite** - Fast build tool and dev server
+- **Yarn** - Package manager
+- **CSS** - Scoped styling with Svelte
+
+## Getting Started
+
+1. **Install dependencies**:
+   ```bash
+   yarn install
+   ```
+
+2. **Start development server**:
+   ```bash
+   yarn dev
+   ```
+
+3. **Open your browser** and navigate to `http://localhost:3000`
+
+## Available Scripts
+
+- `yarn dev` - Start development server
+- `yarn build` - Build for production
+- `yarn preview` - Preview production build
+- `yarn test` - Run tests
+
+## Project Structure
+
+```
+src/
+├── components/          # Svelte components
+│   ├── FileExplorer.svelte
+│   ├── FileIcon.svelte
+│   ├── FolderIcon.svelte
+│   ├── ProjectIcon.svelte
+│   └── DeleteButton.svelte
+├── App.svelte          # Main application component
+├── main.ts            # Application entry point
+├── api.ts             # API and data types
+└── app.css            # Global styles
 ```
 
-## Installing Node, NPM, and Yarn
+## Features
 
-Install Node and NPM
+### File Tree
+- Hierarchical display of files and folders
+- Expandable/collapsible folders
+- Visual indicators for different file types
 
-- Mac
-  - Install [Homebrew](https://docs.brew.sh/Installation)
-  - Run `brew install node`
-- Windows
-  - Download and run the [Node Windows installer](https://nodejs.org/en/download/)
-- Linux
-  - See instructions for your distribution's package manager
+### File Icons
+- Dynamic icons based on file extensions
+- Color-coded for different file types
+- Support for common development files
 
-Install Yarn
+### Delete Functionality
+- Confirmation dialog before deletion
+- Recursive deletion of folders
+- Visual feedback
 
-- Run `npm install -g yarn`
+### Accessibility
+- Keyboard navigation (Enter/Space to expand)
+- ARIA roles and labels
+- Focus indicators
+- Screen reader friendly

@@ -1,51 +1,39 @@
 {
-  "name": "file-explorer-ts-boilerplate",
+  "name": "file-explorer-svelte-boilerplate",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "yarn@1.22.22",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ],
-    "rules": {
-      "import/no-anonymous-default-export": "off"
-    }
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "dependencies": {
-    "@types/lodash": "^4.17.0",
-    "@types/react": "^18.3.1",
-    "@types/react-dom": "^18.3.0",
-    "classnames": "^2.5.1",
-    "lodash": "^4.17.20",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:cypress": "cypress run --component",
+    "test:cypress:open": "cypress open --component",
+    "test:cypress:watch": "cypress run --component --watch",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
+    "lint": "prettier --check .",
+    "lint:fix": "prettier --write .",
+    "type-check": "tsc --noEmit"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.2",
-    "@types/node": "^20.12.8",
-    "@testing-library/jest-dom": "^6.4.2",
-    "@testing-library/react": "^15.0.6",
-    "@testing-library/user-event": "^14.5.2",
-    "react-scripts": "^5.0.1",
+    "@cypress/svelte": "^3.0.0",
+    "@sveltejs/vite-plugin-svelte": "^3.0.0",
+    "@tsconfig/svelte": "^5.0.0",
+    "@types/cypress": "^0.1.6",
+    "cypress": "^14.5.1",
+    "prettier": "^3.0.0",
+    "prettier-plugin-svelte": "^3.0.0",
     "sass": "^1.76.0",
-    "typescript": "^5.4.5"
-  }
+    "svelte": "^5.35.1",
+    "svelte-check": "^3.6.0",
+    "typescript": "^5.4.5",
+    "vite": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "dependencies": {
+    "classnames": "^2.5.1"
+  },
+  "type": "module"
 }
