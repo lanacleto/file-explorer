@@ -2,7 +2,7 @@
 
 Hey! Hope you love it. Thank you, Carta.
 
-![File Explorer Demo](https://file-explorer-x47x.vercel.app/)
+**🌐 [Live Demo](https://file-explorer-x47x.vercel.app)**
 
 ## 🚀 Quick Start
 
