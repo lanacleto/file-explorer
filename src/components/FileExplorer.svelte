@@ -179,16 +179,9 @@
     @include transition(background-color);
 
     &:hover {
+      cursor: pointer;
       .name {
         color: $white;
-      }
-
-      .icon svg {
-        fill: $white;
-      }
-
-      .folder-button svg {
-        fill: $white;
       }
 
       .delete-button {
@@ -259,10 +252,6 @@
     opacity: 0;
     @include transition(all);
 
-    &:hover svg path {
-      fill: $white;
-    }
-
     &:focus {
       opacity: 1;
     }
@@ -274,7 +263,6 @@
 
   .children {
     margin-left: $spacing-3;
-    border-left: 1px solid rgba($border-main, 0.3);
     padding-left: $spacing-2;
   }
 </style>
