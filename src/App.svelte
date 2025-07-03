@@ -40,7 +40,6 @@
 
   main {
     font-family: $font-family-sans;
-    height: 100vh;
     display: flex;
     flex-direction: column;
   }
