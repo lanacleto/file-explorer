@@ -1,79 +1,138 @@
-# File Explorer - Svelte
+# 🌳 File Explorer - Svelte 5
 
-A modern file explorer built with Svelte and TypeScript.
+Hey! Hope you love it. Thank you, Carta.
 
-## Features
+![File Explorer Demo](https://file-explorer-x47x.vercel.app/)
 
-- 📁 **File Tree Navigation**: Expand and collapse folders
-- 🗑️ **Delete Functionality**: Remove files and folders with confirmation
-- 🎨 **Dynamic Icons**: Different icons and colors for various file types
-- ♿ **Accessibility**: Keyboard navigation and ARIA support
-- ⚡ **Fast Performance**: Built with Svelte for optimal performance
+## 🚀 Quick Start
 
-## Tech Stack
+### Prerequisites
 
-- **Svelte 4** - Reactive UI framework
-- **TypeScript** - Type safety
-- **Vite** - Fast build tool and dev server
-- **Yarn** - Package manager
-- **CSS** - Scoped styling with Svelte
+- Node.js 18+
+- yarn
 
-## Getting Started
+### Installation
 
-1. **Install dependencies**:
-   ```bash
-   yarn install
-   ```
+```bash
+# Install dependencies
+yarn install
 
-2. **Start development server**:
-   ```bash
-   yarn dev
-   ```
+# Start development server
+yarn dev
+```
 
-3. **Open your browser** and navigate to `http://localhost:3000`
+Open [http://localhost:3000](http://localhost:3000) to view the file explorer.
 
-## Available Scripts
+### Key Technologies
 
-- `yarn dev` - Start development server
-- `yarn build` - Build for production
-- `yarn preview` - Preview production build
-- `yarn test` - Run tests
+- **Svelte 5**: Latest version with Runes for reactive state management
+- **TypeScript**: Type-safe development
+- **SCSS**: Modern CSS with variables and mixins
+- **Vite**: Fast build tool and dev server
 
-## Project Structure
+### State Management
+
+The file explorer uses a custom store pattern for managing expanded/collapsed states:
+
+```typescript
+// Store for managing folder expansion states
+const fileExplorerStore = {
+  expandedNodes: Set<string>,
+  toggleExpanded: (nodeId: string) => void,
+  isExpanded: (nodeId: string) => boolean
+}
+```
+
+## 🎮 Usage
+
+### Basic Implementation
+
+```svelte
+<script lang="ts">
+  import FileExplorer from './components/FileExplorer.svelte';
+  import type { TreeNode } from './types/fileExplorer';
+
+  let directoryTree: TreeNode | null = $state(null);
+
+  async function handleDelete(id: string) {
+    // Handle file/folder deletion
+    directoryTree = await api.deleteById(id);
+  }
+</script>
+
+<FileExplorer node={directoryTree} onDelete={handleDelete} />
+```
+
+## ♿ Accessibility
+
+The file explorer is fully accessible with:
+
+- **ARIA Roles**: `tree`, `treeitem`, `group`
+- **Keyboard Navigation**: Tab, Enter, Space support
+- **Screen Reader**: Descriptive labels and states
+- **Focus Management**: Visible focus indicators
+- **WCAG 2.1 AA**: Compliant with accessibility standards
+
+### Keyboard Shortcuts
+
+- **Tab**: Navigate between interactive elements
+- **Enter/Space**: Expand/collapse folders
+- **Arrow Keys**: Navigate tree structure (planned)
+
+## 🔧 Development
+
+### Available Scripts
+
+```bash
+# Development
+yarn dev          # Start dev server
+yarn build        # Build for production
+yarn preview      # Preview production build
+
+# Code Quality
+yarn check        # Type checking
+yarn lint         # Code formatting
+yarn type-check   # TypeScript validation
+
+# Testing
+yarn test:cypress # Run component tests
+```
+
+### Project Structure
 
 ```
 src/
-├── components/          # Svelte components
-│   ├── FileExplorer.svelte
-│   ├── FileIcon.svelte
-│   ├── FolderIcon.svelte
-│   ├── ProjectIcon.svelte
-│   └── DeleteButton.svelte
-├── App.svelte          # Main application component
-├── main.ts            # Application entry point
-├── api.ts             # API and data types
-└── app.css            # Global styles
+├── components/
+│   └── FileExplorer.svelte    # Main component
+├── services/
+│   ├── iconMapping.ts         # File icon logic
+│   └── keyboardHandler.ts     # Keyboard navigation
+├── stores/
+│   └── fileExplorerStore.ts   # State management
+├── types/
+│   └── fileExplorer.ts        # TypeScript interfaces
+├── assets/
+│   └── icons/                 # SVG icon components
+└── styles/
+    └── variables.scss         # Design system variables
 ```
 
-## Features
+## 🧪 Testing
 
-### File Tree
-- Hierarchical display of files and folders
-- Expandable/collapsible folders
-- Visual indicators for different file types
+The project includes comprehensive testing:
 
-### File Icons
-- Dynamic icons based on file extensions
-- Color-coded for different file types
-- Support for common development files
+- **Component Tests**: Cypress for UI interactions
+- **Type Checking**: TypeScript validation
+- **Linting**: Prettier for code formatting
 
-### Delete Functionality
-- Confirmation dialog before deletion
-- Recursive deletion of folders
-- Visual feedback
+## 📦 Build & Deploy
 
-### Accessibility
-- Keyboard navigation (Enter/Space to expand)
-- ARIA roles and labels
-- Focus indicators
-- Screen reader friendly
+```bash
+# Build for production
+yarn build
+
+# Preview production build
+yarn preview
+```
+
+**Built with ❤️ using Svelte 5 and TypeScript**
