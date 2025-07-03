@@ -4,7 +4,6 @@
   import FileExplorer from './components/FileExplorer.svelte';
 
   let directoryTree: TreeNode | null = null;
-  let expandedNodes = new Set<string>();
 
   onMount(async () => {
     directoryTree = await api.getDirectoryTree();
@@ -19,7 +18,6 @@
 <main>
   <FileExplorer 
     node={directoryTree} 
-    {expandedNodes} 
     onDelete={handleDelete}
   />
 </main>

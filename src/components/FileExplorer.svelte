@@ -148,7 +148,7 @@
 {/if}
 
 <style lang="scss">
-  @import '../styles/variables.scss';
+  @use '../styles/variables.scss' as *;
   
   .file-explorer {
     width: fit-content;
@@ -161,7 +161,7 @@
     max-width: 100vw;
     background-color: $background-main;
 
-d    &::-webkit-scrollbar {
+    &::-webkit-scrollbar {
       width: 4px;
       height: 4px;
     }
